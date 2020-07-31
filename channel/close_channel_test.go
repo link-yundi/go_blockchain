@@ -52,3 +52,19 @@ func TestCloseChannelWithBuffer(t *testing.T) {
 		// 可以看出，读端是通过读取零值来判断channel是否关闭的
 	}
 }
+
+func TestRange(t *testing.T) {
+	ch := make(chan int, 5)
+	go func() {
+		for i := 0; i < 5; i++ {
+			ch <- i
+		}
+		close(ch)
+		t.Log("通道关闭")
+	}()
+	time.Sleep(5 * time.Second)
+	// for range 读取 channel
+	for value := range ch {
+		t.Log("读取到数据,", value)
+	}
+}
