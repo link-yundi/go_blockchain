@@ -1,6 +1,7 @@
 package channel
 
 import (
+	"fmt"
 	"testing"
 )
 
@@ -9,7 +10,7 @@ import (
 // 单向读channel var recvCh <- chan int 表示只能从里面读取int类型数据 make(<- chan int)
 // 转换: 双向channel 可以隐式转换为任意一种channel    sendCh = ch
 // 		单向channel 不能转换为双向channel  ch = sendCh/recvCh error!!!!
-// 转换的作用：传参
+// 转换的作用：传参 **传引用**
 
 //func TestSingleChannel(t *testing.T) {
 //	ch := make(chan int)
@@ -42,4 +43,24 @@ func TestRecvCh(t *testing.T) {
 	var recvCh <-chan int = ch
 	val := <-recvCh
 	t.Log(val)
+}
+
+func send(in chan<- int) {
+	in <- 89
+	close(in)
+}
+
+func recv(out <-chan int) {
+	n := <-out
+	fmt.Println("读到", n)
+}
+
+func TestSingleChannel(t *testing.T) {
+	ch := make(chan int)
+	go func() {
+		send(ch)
+		//send(ch)
+	}()
+	recv(ch)
+	//recv(ch)
 }
