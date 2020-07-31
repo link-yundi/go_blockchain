@@ -7,6 +7,8 @@ import (
 	"time"
 )
 
+// 需要记住：channel 一定要和go程一起出现，一个go程负责读，一个负责写，两端同时操作，不然会报错
+
 var wg sync.WaitGroup
 
 func printer(str string) {
