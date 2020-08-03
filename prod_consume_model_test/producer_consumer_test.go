@@ -17,6 +17,7 @@ func Producer(in chan<- int) {
 	// 消息生产者，写入数据
 	for i := 0; i < 10; i++ {
 		in <- i * i
+		fmt.Println("生产:", i*i)
 	}
 	close(in)
 }
@@ -28,8 +29,14 @@ func Consumer(out <-chan int) {
 	}
 }
 
-func TestProdConsumer(t *testing.T) {
+func TestProdConsumerWithoutBuffer(t *testing.T) {
 	ch := make(chan int)
+	go Producer(ch)
+	Consumer(ch)
+}
+
+func TestProducerConsumerWithBuffer(t *testing.T) {
+	ch := make(chan int, 5)
 	go Producer(ch)
 	Consumer(ch)
 }
