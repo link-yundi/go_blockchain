@@ -21,6 +21,7 @@ func printer(str string) {
 func person1() {
 	wg.Done()
 	printer("hello")
+	//wg.Done()
 }
 
 func person2() {

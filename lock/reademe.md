@@ -52,7 +52,7 @@ func main() {
 // 子goroutine拿到了ch1的读，尝试拿ch2的写，主goroutine拿到ch2的读，同时想拿ch1的写
 ```
 
-
+在go中，尽量不要将mutex、rwMutex与channel混用，容易导致死锁（隐性死锁）单独使用channel或者mutex、rwMutex已经足够完成数据同步，根据推荐做法：通过通信来共享内存，而不是通过共享内存来通信。也就是说，建议使用channel
 
 2. 互斥锁 mutex
 
@@ -136,9 +136,6 @@ func TestMutex(t *testing.T) {
 }
 ```
 
-
-
-
-
 3. 读写锁
 
+> 读时共享，写时独占。写锁优先级高于读锁
