@@ -89,6 +89,55 @@ func TestChannel(t *testing.T) {
 } // 在不借助channel的情况下，打印会错乱，通过channel的阻塞可以保证数据的正确输出
 ```
 
+> 通过互斥锁来完成同步 读 -> 锁 -> 共享数据，写 -> 锁 -> 共享数据，也就是说，对于共享数据的操作，都得拿到锁，拿不到锁的goroutine会阻塞在锁这里
+
+```go
+package mutex
+
+import (
+	"sync"
+	"testing"
+	"time"
+)
+
+var mutex sync.Mutex // 创建一个互斥锁，新建的互斥锁状态为0，未加锁。锁只有一把。
+var get []int32
+
+func printer(str string) {
+	mutex.Lock() // 访问共享数据之前，加锁
+	for _, ch := range str {
+		get = append(get, ch)
+		time.Sleep(300 * time.Millisecond)
+	}
+	mutex.Unlock() // 共享数据访问结束，解锁
+}
+
+func person1() {
+	wg.Done()	// done不是在printer完成后加，是为了保证先执行执行person1再执行person2的同时查看锁的效果
+	printer("hello")
+}
+
+func person2() {
+	printer("world")
+	wg.Done()
+}
+
+func TestMutex(t *testing.T) {
+	want := "helloworld"
+	wg.Add(1)
+	go person1()
+	wg.Wait()
+	wg.Add(1)
+	go person2()
+	wg.Wait()
+	if want != string(get) {
+		t.Errorf("expect %s, get %s", want, string(get))
+	}
+}
+```
+
+
+
 
 
 3. 读写锁
